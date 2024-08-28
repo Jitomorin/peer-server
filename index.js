@@ -1,33 +1,38 @@
-require('dotenv').config()
+require('dotenv').config();
 
-const { ExpressPeerServer } = require('peer')
-const express = require('express')
-const cors = require('cors')
-const http = require('http')
+const { ExpressPeerServer } = require('peer');
+const express = require('express');
+const cors = require('cors');
+const http = require('http');
 
-const app = express()
-const server = http.createServer(function (req, res) {
-  res.writeHead(200, { 'Content-Type': 'text/plain' })
-  res.end('Hello world!')
-})
+const app = express();
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Hello world!');
+});
 
-const PORT = process.env.PORT || 9000
+const PORT = process.env.PORT || 9000;
 
-app.use(express.static('public'))
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:3000',  // Replace with your frontend's origin
+}));
+
+app.use(express.static('public'));
 
 const peerServer = ExpressPeerServer(server, {
   debug: true,
   allow_discovery: true,
-})
+});
 
-app.use('/myapp', peerServer)
+app.use('/myapp', peerServer);
 
 // In-memory store for searching users
-const searchingUsers = []
+const searchingUsers = [];
 
 // Route to add a user to search mode
-app.post('/start-search', (req, res) => {
-  const { id } = req.body;
+app.get('/start-search/:id', (req, res) => {
+  const { id } = req.params;
   if (!searchingUsers.includes(id)) {
     searchingUsers.push(id);
   }
@@ -35,8 +40,8 @@ app.post('/start-search', (req, res) => {
 });
 
 // Route to remove a user from search mode
-app.post('/stop-search', (req, res) => {
-  const { id } = req.body;
+app.get('/stop-search/:id', (req, res) => {
+  const { id } = req.params;
   const index = searchingUsers.indexOf(id);
   if (index > -1) {
     searchingUsers.splice(index, 1);
@@ -45,8 +50,8 @@ app.post('/stop-search', (req, res) => {
 });
 
 // Route to find a match for a user in search mode
-app.post('/find-match', (req, res) => {
-  const { id } = req.body;
+app.get('/find-match/:id', (req, res) => {
+  const { id } = req.params;
   const otherUser = searchingUsers.find(userId => userId !== id);
 
   if (otherUser) {
@@ -59,7 +64,6 @@ app.post('/find-match', (req, res) => {
   }
 });
 
-
 server.listen(PORT, () => {
-  console.log(`PeerJS server running on port ${PORT}`)
-})
+  console.log(`PeerJS server running on port ${PORT}`);
+});
