@@ -26,38 +26,39 @@ app.use('/myapp', peerServer)
 const searchingUsers = []
 
 // Route to add a user to search mode
-app.get('/start-search/:id', (req, res) => {
-  const { id } = req.params
+app.post('/start-search', (req, res) => {
+  const { id } = req.body;
   if (!searchingUsers.includes(id)) {
-    searchingUsers.push(id)
+    searchingUsers.push(id);
   }
-  res.json({ success: true })
-})
+  res.json({ success: true });
+});
 
 // Route to remove a user from search mode
-app.get('/stop-search/:id', (req, res) => {
-  const { id } = req.params
-  const index = searchingUsers.indexOf(id)
+app.post('/stop-search', (req, res) => {
+  const { id } = req.body;
+  const index = searchingUsers.indexOf(id);
   if (index > -1) {
-    searchingUsers.splice(index, 1)
+    searchingUsers.splice(index, 1);
   }
-  res.json({ success: true })
-})
+  res.json({ success: true });
+});
 
 // Route to find a match for a user in search mode
-app.get('/find-match/:id', (req, res) => {
-  const { id } = req.params
-  const otherUser = searchingUsers.find(userId => userId !== id)
+app.post('/find-match', (req, res) => {
+  const { id } = req.body;
+  const otherUser = searchingUsers.find(userId => userId !== id);
 
   if (otherUser) {
     // If a match is found, remove both users from the search list
-    searchingUsers.splice(searchingUsers.indexOf(otherUser), 1)
-    searchingUsers.splice(searchingUsers.indexOf(id), 1)
-    res.json({ match: otherUser })
+    searchingUsers.splice(searchingUsers.indexOf(otherUser), 1);
+    searchingUsers.splice(searchingUsers.indexOf(id), 1);
+    res.json({ match: otherUser });
   } else {
-    res.json({ match: null })
+    res.json({ match: null });
   }
-})
+});
+
 
 server.listen(PORT, () => {
   console.log(`PeerJS server running on port ${PORT}`)
