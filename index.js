@@ -32,6 +32,7 @@ const searchingUsers = [];
 
 // Route to add a user to search mode
 app.get('/start-search/:id', (req, res) => {
+  console.log('started searching')
   const { id } = req.params;
   if (!searchingUsers.includes(id)) {
     searchingUsers.push(id);
@@ -41,6 +42,8 @@ app.get('/start-search/:id', (req, res) => {
 
 // Route to remove a user from search mode
 app.get('/stop-search/:id', (req, res) => {
+    console.log('stopped searching')
+
   const { id } = req.params;
   const index = searchingUsers.indexOf(id);
   if (index > -1) {
@@ -51,6 +54,8 @@ app.get('/stop-search/:id', (req, res) => {
 
 // Route to find a match for a user in search mode
 app.get('/find-match/:id', (req, res) => {
+    console.log('finding match')
+
   const { id } = req.params;
   const otherUser = searchingUsers.find(userId => userId !== id);
 
